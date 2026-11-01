@@ -36,6 +36,7 @@
   #ledSub b { color:var(--gold); }
   #ledLogo { display:none; }
   #frame { display:none; }
+  #camWin, #showcase { display:none; }
 
   /* ===== Chế độ khung viền (?khung): giữa trong suốt để thấy hình MC từ camera ===== */
   body.khung, body.khung html { background:transparent; }
@@ -64,6 +65,28 @@
   body.khung #booth { bottom:110px; height:200px; left:170px; right:170px; background:linear-gradient(#1a1030ee, #0a0614f5); }
   body.khung #booth .logo { font-size:46px; }
   body.khung #ticker { bottom:318px; left:170px; right:170px; border-radius:10px; }
+
+  /* Camera thu nhỏ ở ô bên phải: nền quán bar che kín, chỉ khoét 1 ô (x 570–1050, y 470–1323) */
+  body.khung #stage { background:none; }
+  body.khung #stage::before { content:""; position:absolute; inset:0;
+    background:radial-gradient(ellipse at 50% 30%, #2a0c4a 0%, #120626 45%, var(--bg) 100%);
+    -webkit-mask:linear-gradient(#000 0 0) 0 0/100% 100% no-repeat, linear-gradient(#000 0 0) 570px 470px/480px 853px no-repeat;
+    -webkit-mask-composite:xor; mask-composite:exclude; }
+  body.khung #camWin { display:block; position:absolute; left:564px; top:464px; width:492px; height:865px;
+    border:6px solid var(--cyan); border-radius:18px; pointer-events:none;
+    box-shadow:0 0 40px #22e4ffaa; animation:glow 3s ease-in-out infinite alternate; }
+  body.khung #camWin span { position:absolute; left:50%; top:-26px; transform:translateX(-50%); white-space:nowrap;
+    background:var(--pink); color:#fff; font-weight:900; font-size:26px; padding:4px 18px; border-radius:20px; }
+  body.khung #showcase { display:flex; flex-direction:column; align-items:center; position:absolute;
+    left:36px; top:470px; width:500px; padding:16px; border-radius:20px; background:#000000aa; border:3px solid #ff2e8899; }
+  body.khung .scHead { color:var(--gold); font-weight:900; font-size:30px; letter-spacing:3px; margin-bottom:10px; }
+  body.khung #scImg { width:420px; height:420px; object-fit:cover; border-radius:14px; transition:opacity .6s; }
+  body.khung #scName { font-size:30px; font-weight:800; text-align:center; margin-top:12px; min-height:76px; line-height:1.25; }
+  body.khung .scSite { color:#ff4d4d; font-size:26px; font-weight:800; margin-top:6px; }
+  body.khung #board { left:36px; right:auto; top:1120px; width:500px; }
+  body.khung #card { top:480px; left:40px; right:40px; }
+  body.khung .stack { bottom:300px; }
+  body.khung .beam:nth-child(2) { display:block; }
 
   /* Cột loa Makxim */
   .stack { position:absolute; bottom:520px; width:170px; display:flex; flex-direction:column; gap:10px; }
@@ -166,6 +189,13 @@
   </div>
 
   <div id="board"><h3>BẢNG VÀNG ĐÊM NAY</h3><ul id="boardList"></ul></div>
+  <div id="camWin"><span>MC WIN SKY BAR</span></div>
+  <div id="showcase">
+    <div class="scHead">LOA ĐANG PHÁT</div>
+    <img id="scImg" alt="">
+    <div id="scName"></div>
+    <div class="scSite">makximproaudio.vn</div>
+  </div>
 
   <div id="card"><div id="cardName"></div><div id="cardGift"></div></div>
   <div id="ticker"><div id="tickerText"></div></div>
@@ -218,6 +248,22 @@ if (location.protocol.startsWith('http')) {
 }
 if (location.search.includes('khung')) {
   document.body.classList.add('khung');
+  // Bảng giới thiệu loa Makxim thật, đổi sản phẩm mỗi 12 giây
+  const SP = [
+    ['sp/reggere-atf12.jpg', 'Loa toàn dải Reggere ATF-12'],
+    ['sp/lbs-tk12.jpg', 'Loa toàn dải LBS TK-12'],
+    ['sp/reggere-gd12.jpg', 'Loa toàn dải Reggere GD-12'],
+    ['sp/mk-25t2-30.jpg', 'Loa di động Makxim MK-25T2-30'],
+    ['sp/ma-5t1-22.jpg', 'Loa array di động Makxim Bass 50'],
+    ['sp/emotion-m69.jpg', "Loa xách tay Makxim Emotion D'Vintage"],
+  ];
+  let spi = 0;
+  const showSP = () => {
+    const img = document.getElementById('scImg');
+    img.style.opacity = 0;
+    setTimeout(() => { img.src = SP[spi][0]; document.getElementById('scName').textContent = SP[spi][1]; img.style.opacity = 1; spi = (spi + 1) % SP.length; }, 600);
+  };
+  showSP(); setInterval(showSP, 12000);
   document.documentElement.style.background = document.body.style.background = 'transparent';
 }
 
