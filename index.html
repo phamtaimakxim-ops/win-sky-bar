@@ -173,6 +173,10 @@ function fit() {
   stage.style.transform = `translate(-50%,-50%) scale(${s})`;
 }
 addEventListener('resize', fit); fit();
+// Tạm thời: báo kích thước khung hiển thị về máy để chỉnh khung LIVE Studio
+if (location.search.includes('obs')) setTimeout(() => {
+  new Image().src = `http://localhost:8765/size?w=${innerWidth}&h=${innerHeight}&dpr=${devicePixelRatio}&sw=${screen.width}&sh=${screen.height}`;
+}, 2000);
 if (location.search.includes('obs')) document.body.classList.add('obs');
 
 const eq = document.getElementById('eq');
