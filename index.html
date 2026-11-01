@@ -43,11 +43,11 @@
   body.khung .beam { opacity:.12; }
   body.khung .beam:nth-child(2) { display:none; }            /* bỏ đèn giữa để không che mặt */
   body.khung #camHole { display:none; }
+  /* Viền neon: chỉ vẽ đường viền, ruột trong suốt */
   body.khung #frame { display:block; position:absolute; inset:14px; border-radius:30px; pointer-events:none;
-    border:6px solid transparent;
-    background:linear-gradient(#0000,#0000) padding-box, linear-gradient(160deg, var(--pink), #7b2cff, var(--cyan), var(--gold), var(--pink)) border-box;
+    border:6px solid var(--pink); background:none;
     box-shadow:0 0 40px #ff2e88aa, inset 0 0 40px #ff2e8855; animation:glow 3s ease-in-out infinite alternate; }
-  @keyframes glow { to { box-shadow:0 0 70px #22e4ffaa, inset 0 0 60px #22e4ff55; } }
+  @keyframes glow { to { border-color:var(--cyan); box-shadow:0 0 70px #22e4ffaa, inset 0 0 60px #22e4ff55; } }
   /* TikTok che khoảng 180px trên cùng (tên kênh, người xem) nên bảng LED đặt thấp xuống */
   body.khung #led { top:190px; left:120px; right:120px; height:270px; background:#000000b8; }
   body.khung #ledTitle { font-size:100px; }
@@ -206,6 +206,16 @@ function fit() {
 }
 addEventListener('resize', fit); fit();
 if (location.search.includes('obs')) document.body.classList.add('obs');
+// Tự cập nhật: mỗi 60 giây hỏi version.txt, có bản mới thì tải lại trang (LIVE Studio không có nút tải lại)
+if (location.protocol.startsWith('http')) {
+  let ver = null;
+  setInterval(async () => {
+    try {
+      const v = (await (await fetch('version.txt?t=' + Date.now(), { cache: 'no-store' })).text()).trim();
+      if (ver === null) ver = v; else if (v && v !== ver) location.reload();
+    } catch {}
+  }, 60000);
+}
 if (location.search.includes('khung')) {
   document.body.classList.add('khung');
   document.documentElement.style.background = document.body.style.background = 'transparent';
